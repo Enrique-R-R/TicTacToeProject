@@ -32,6 +32,7 @@ class Game:
         self.player_picks = []
         self.computer_picks = []
         self.game_over = False
+        self.computer_difficulty = "Easy"
         self.winning_combinations = [
                                         ["1", "2", "3"],
                                         ["1", "5", "9"],
@@ -71,13 +72,80 @@ class Game:
         print("Computer turn")
         time.sleep(1)
 
-        picked_square = random.choice(self.open_positions)
+        if self.computer_difficulty == "Easy":
+            picked_square = self.computer_easy_moves()
+        else:
+            picked_square = self.computer_hard_moves()
+
         index = self.numbered_board.find(picked_square)
         self.open_positions.remove(picked_square)
         self.game_board = self.game_board[:index] + "O" + self.game_board[index + 1:]
         self.computer_picks.append(picked_square)
         print(self.game_board)
         self.player_turn = True
+
+    def set_computer_dificulty(self):
+        answer = input("Do you want to play in hard mode? (Type anything to confirm): ")
+        if answer:
+            self.computer_difficulty = "Hard"
+        else:
+            self.computer_difficulty = "Easy"
+
+    def computer_easy_moves(self):
+        return random.choice(self.open_positions)
+
+    def computer_hard_moves(self):
+        print("Computer turn")
+
+        if "5" in self.open_positions:
+            return "5"
+        elif len(self.open_positions) == 8:
+            return "1"
+        elif len(self.open_positions) == 7:
+            if self.player_picks[0] in ("1", "2", "4"):
+                return "9"
+            elif self.player_picks[0] in ("3", "6"):
+                return "7"
+            elif self.player_picks[0] in ("7", "8"):
+                return "3"
+            else:
+                return "1"
+        elif len(self.open_positions) == 6:
+            pick = self.check_close_win(self.player_picks)
+            if pick:
+                return pick
+            else:
+                if self.computer_picks[0] == "5":
+                    if "2" in self.open_positions:
+                        return "2"
+                    else:
+                        if "9" in self.open_positions:
+                            return "1"
+                        else:
+                            return "3"
+                else:
+                    return random.choice(self.open_positions)
+
+        else:
+            pick = self.check_close_win(self.computer_picks)
+            if pick:
+                return pick
+            else:
+                pick = self.check_close_win(self.player_picks)
+                if pick:
+                    return pick
+                else:
+                    return random.choice(self.open_positions)
+
+    def check_close_win(self, picks):
+        temp_picks = picks.copy()
+        for i in self.open_positions:
+            temp_picks.append(i)
+            for winning_line in self.winning_combinations:
+                if all(x in temp_picks for x in winning_line):
+                    return i
+            temp_picks.remove(i)
+        return ""
 
     def check_player_win(self):
         if len(self.player_picks) >= 3:
@@ -119,9 +187,12 @@ go_again = ""
 
 while not go_again:
 
+    game.set_computer_dificulty()
     print(game.game_board)
 
     while not game.game_over:
         game.next_move()
 
+    game = Game()
     go_again = input("Do you want to go again? Type anything to stop playing: ")
+
