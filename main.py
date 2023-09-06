@@ -20,21 +20,28 @@ class Game:
 ─────│─────│─────
      │     │   
 """
+        self.numbered_board = """
+  1  │  2  │  3
+─────│─────│─────
+  4  │  5  │  6
+─────│─────│─────
+  7  │  8  │  9
+"""
         self.open_positions = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
         self.player_turn = choose_starting()
         self.player_picks = []
         self.computer_picks = []
         self.game_over = False
         self.winning_combinations = [
-    ["1", "2", "3"],
-    ["1", "5", "9"],
-    ["1", "4", "7"],
-    ["2", "5", "8"],
-    ["3", "5", "7"],
-    ["3", "6", "9"],
-    ["4", "5", "6"],
-    ["7", "8", "9"]
-]
+                                        ["1", "2", "3"],
+                                        ["1", "5", "9"],
+                                        ["1", "4", "7"],
+                                        ["2", "5", "8"],
+                                        ["3", "5", "7"],
+                                        ["3", "6", "9"],
+                                        ["4", "5", "6"],
+                                        ["7", "8", "9"]
+                                    ]
 
     def next_move(self):
         if self.player_turn:
@@ -53,7 +60,7 @@ class Game:
             print("Sorry, that square is not available.")
             picked_square = input(f"Please, pick a number to place your sign (X): {self.open_positions}: ")
 
-        index = NUMBERED_BOARD.find(picked_square)
+        index = self.numbered_board.find(picked_square)
         self.open_positions.remove(picked_square)
         self.game_board = self.game_board[:index] + "X" + self.game_board[index + 1:]
         self.player_picks.append(picked_square)
@@ -65,7 +72,7 @@ class Game:
         time.sleep(1)
 
         picked_square = random.choice(self.open_positions)
-        index = NUMBERED_BOARD.find(picked_square)
+        index = self.numbered_board.find(picked_square)
         self.open_positions.remove(picked_square)
         self.game_board = self.game_board[:index] + "O" + self.game_board[index + 1:]
         self.computer_picks.append(picked_square)
@@ -94,18 +101,12 @@ class Game:
             self.game_over = True
 
 
-NUMBERED_BOARD = """
-  1  │  2  │  3
-─────│─────│─────
-  4  │  5  │  6
-─────│─────│─────
-  7  │  8  │  9
-"""
+game = Game()
 
 print("Welcome to the game of Tic tac toe.")
 time.sleep(1)
 print("The board has nine numbered squares, from 1 to 9, like this:")
-print(NUMBERED_BOARD)
+print(game.numbered_board)
 time.sleep(1)
 print("To play, choose one of the numbers still left unchosen.")
 time.sleep(1)
@@ -118,13 +119,9 @@ go_again = ""
 
 while not go_again:
 
-    game = Game()
     print(game.game_board)
 
     while not game.game_over:
         game.next_move()
 
     go_again = input("Do you want to go again? Type anything to stop playing: ")
-
-
-
